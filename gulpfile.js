@@ -4,6 +4,9 @@ const browserSync = require('browser-sync').create() // load browser-sync and cr
 const postcss = require('gulp-postcss') // load the postcss library
 const autoprefixer = require('autoprefixer') // load the autoprefixer plugin
 const cssnano = require('cssnano') // load the cssnano plugin
+const concat = require('gulp-concat')//load the gulp-concat for concatenating js files
+const rename = require('gulp-rename')//load gulp-rename to rename our js file
+const uglify = require('gulp-uglify')//load uglify for minifying our js file
 
 // Define a task to compile Sass and run autoprefixer and cssnano
 gulp.task('sass', function () {
@@ -19,6 +22,19 @@ gulp.task('sass', function () {
     .pipe(gulp.dest('css/min')) // path to output the minified css file
     .pipe(browserSync.stream()) // run the browsersync stream
 })
+
+gulp.task('scripts', function () {
+  return gulp.src('js/*.js')//setting the source files for gulp to work with
+    .pipe(concat('main.js'))//running concat on all the files directly inside js folder with extension .js.
+    .pipe(gulp.dest('js/dev'))//save the concatenated file into dev folder
+    .pipe(rename('main.min.js'))//pipe the contatenated file and rename it to main.min.js
+    .pipe(uglify())//now running uglify on the renamed file to minify the JavaScript
+    .pipe(gulp.dest('js.min'))//saving the minified file in min folder inside js
+    .pipe(browerSync.stream())//run the browsersync stream
+})
+
+//watch for changes to any files directly inside the js folder and on change run the task scripts
+gulp.watch('js/*.js',gulp.series('scripts'))
 
 // Define the default task
 gulp.task('default', function () {
